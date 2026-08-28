@@ -1,5 +1,5 @@
 import { pgTable, text, integer, timestamp } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
+import { defineRelations, sql } from "drizzle-orm";
 import { lessons } from "./lessons";
 import { enrollments } from "./enrollments";
 
@@ -17,3 +17,21 @@ export const courses = pgTable("courses", {
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+// Sets up the relations: a course has many lessons and many enrollments.
+
+export const coursesRelations = defineRelations(
+    { courses, lessons, enrollments },
+    (helpers) => ({
+        courses: {
+            lessons: helpers.many.lessons({
+                from: helpers.courses.id,
+                to: helpers.lessons.courseId,
+            }),
+            enrollments: helpers.many.enrollments({
+                from: helpers.courses.id,
+                to: helpers.enrollments.courseId,
+            }),
+        },
+    })
+);

@@ -1,11 +1,10 @@
-import { defineRelations, sql } from "drizzle-orm";
+import { sql, defineRelations } from "drizzle-orm";
+import { pgTable, text, timestamp, integer, uniqueIndex } from "drizzle-orm/pg-core";
 
-import { integer, text, timestamp } from "drizzle-orm/pg-core/columns";
-import { uniqueIndex } from "drizzle-orm/pg-core/indexes";
-import { pgTable } from "drizzle-orm/pg-core/table";
-import { enrollments } from "./enrollments";
 import { userAchievements } from "./achievements";
+import { enrollments } from "./enrollments";
 import { progress } from "./progress";
+
 
 
 export const users = pgTable("users", {
@@ -34,28 +33,23 @@ export const users = pgTable("users", {
 
 // Sets up the relations: a user can have many
 // enrollments, achievements, and progress records.
-//
-// NOTE: this installed drizzle-orm does not export `relations()`.
-// The relation API is `defineRelations(schema, helpers)` — you pass the set
-// of tables once and build each table's relations with helpers.one/many,
-// referencing columns as helpers.<table>.<column>.
 
-// export const usersRelations = defineRelations(
-//     { users, enrollments, userAchievements, progress },
-//     (helpers) => ({
-//         users: {
-//             enrollments: helpers.many.enrollments({
-//                 from: helpers.users.id,
-//                 to: helpers.enrollments.userId,
-//             }),
-//             userAchievements: helpers.many.userAchievements({
-//                 from: helpers.users.id,
-//                 to: helpers.userAchievements.userId,
-//             }),
-//             progress: helpers.many.progress({
-//                 from: helpers.users.id,
-//                 to: helpers.progress.userId,
-//             }),
-//         },
-//     }),
-// );
+export const usersRelations = defineRelations(
+    { users, enrollments, userAchievements, progress },
+    (helpers) => ({
+        users: {
+            enrollments: helpers.many.enrollments({
+                from: helpers.users.id,
+                to: helpers.enrollments.userId,
+            }),
+            userAchievements: helpers.many.userAchievements({
+                from: helpers.users.id,
+                to: helpers.userAchievements.userId,
+            }),
+            progress: helpers.many.progress({
+                from: helpers.users.id,
+                to: helpers.progress.userId,
+            }),
+        },
+    }),
+);

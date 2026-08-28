@@ -8,7 +8,7 @@ import {
     json,
     uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { relations, sql } from "drizzle-orm";
+import { defineRelations, sql } from "drizzle-orm";
 import { users } from "./users";
 
 // Defines the "achievements" table, storing achievement details
@@ -51,21 +51,34 @@ export const userAchievements = pgTable(
 );
 
 // Sets up the relation: one achievement can be earned by many users (userAchievements).
-export const achievementsRelations = relations(achievements, ({ many }) => ({
-    users: many(userAchievements),
-}));
+
+export const AchievementsRelations = defineRelations(
+    { achievements, userAchievements },
+    (helpers) => ({
+        achievements: {
+            userAchievements: helpers.many.userAchievements({
+                from: helpers.achievements.id,
+                to: helpers.userAchievements.achievementId,
+            })
+        }
+    })
+)
 
 // Sets up the relation: a user_achievement links to one user and one achievement.
-export const userAchievementsRelations = relations(
-    userAchievements,
-    ({ one }) => ({
-        user: one(users, {
-            fields: [userAchievements.userId],
-            references: [users.id],
-        }),
-        achievement: one(achievements, {
-            fields: [userAchievements.achievementId],
-            references: [achievements.id],
-        }),
-    }),
-);
+
+export const UserAchievementsRelations = defineRelations(
+    { userAchievements, users, achievements },
+    (helpers) => ({
+        userAchievements: {
+            users: helpers.one.users({
+                from: helpers.userAchievements.userId,
+                to: helpers.users.id,
+            }),
+            achievements: helpers.one.achievements({
+                from: helpers.userAchievements.achievementId,
+                to: helpers.achievements.id,
+            })
+        }
+    })
+)
+

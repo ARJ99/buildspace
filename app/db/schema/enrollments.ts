@@ -5,7 +5,7 @@ import {
     boolean,
     uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
+import { defineRelations, sql } from "drizzle-orm";
 import { users } from "./users";
 import { courses } from "./courses";
 
@@ -36,3 +36,19 @@ export const enrollments = pgTable(
         };
     },
 );
+
+// Sets up the relations: an enrollment links to one user and one course.
+export const enrollmentsRelations = defineRelations(
+    { enrollments, users, courses },
+    (helpers) => ({
+        enrollments: {
+            users: helpers.one.users({
+                from: helpers.enrollments.userId,
+                to: helpers.users.id,
+            }),
+            courses: helpers.one.courses({
+                from: helpers.enrollments.courseId,
+                to: helpers.courses.id,
+            })
+        }
+    }))

@@ -1,5 +1,5 @@
 import { pgTable, text, integer, timestamp } from "drizzle-orm/pg-core";
-import {  sql } from "drizzle-orm";
+import {  defineRelations, sql } from "drizzle-orm";
 import { courses } from "./courses";
 import { progress } from "./progress";
 
@@ -18,3 +18,19 @@ export const lessons = pgTable("lessons", {
         .references(() => courses.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+// Sets up the relations: a lesson belongs
+// to one course and can have many progress records.
+
+export const lessonsRelations = defineRelations(
+    {lessons, courses, progress},
+    (helpers)=>({
+        lessons:{
+            courses:helpers.one.courses({
+                from:helpers.lessons.courseId,
+                to:helpers.courses.id,
+            }),
+            progress:helpers.many.progress()
+        }
+    })
+)
