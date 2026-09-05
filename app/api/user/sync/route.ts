@@ -59,7 +59,7 @@ export async function POST() {
         }
 
         // User already exists → update their profile.
-        
+
         // NOTE: `db.update()` is the SQL builder API, which is DIFFERENT from
         // the relational builder above. Its `.where()` takes a SQL expression
         // (`eq(users.clerkId, userId)`), NOT the object filter used by
@@ -82,6 +82,11 @@ export async function POST() {
         });
     } catch (error) {
         console.error("user/sync error:", error);
-        return new NextResponse("Internal Server Error", { status: 500 });
+        return NextResponse.json(
+            {
+                error: "Failed to sync user",
+                details: error
+            },
+            { status: 500 });
     }
 }
