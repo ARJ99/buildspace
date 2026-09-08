@@ -1,4 +1,5 @@
 import { db } from "@/app/db";
+import { calculateLevel, calculateNextLevelPoints } from "@/lib/utils";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
@@ -52,14 +53,7 @@ export async function GET() {
         const completedCourses = allenrollments.filter((enrollment) => enrollment.completed).length;
         const coursesInProgress = allenrollments.filter((enrollment) => !enrollment.completed).length;
 
-        // Get completed lessons, loading each lesson and its course so we can
-        // return titles for "recent activity" without extra queries.
-        //
-        // `where`   : object filter → `WHERE user_id = $1 AND completed = TRUE`
-        // `with`    : eager-loads relations — each progress row gets a nested
-        //             `lesson` (a "one" relation) which itself carries its
-        //             `course` (also a "one" relation).
-        // `orderBy` : object form → `ORDER BY completed_at DESC`.
+        // Get completed lessons,
         const completedLessons = await db.query.progress.findMany({
             where: {
                 userId: dbUser.id,
@@ -77,36 +71,71 @@ export async function GET() {
             },
         });
 
+        const totalLessonsCompleted = completedLessons.length;
+
+        //Calculate today's progress
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Set to start of the day
+
+        const todayCompleted = completedLessons.filter((lesson) => {
+            if (!lesson.completedAt) return false;
+            const completedDate = new Date(lesson.completedAt);
+            completedDate.setHours(0, 0, 0, 0); // Set to start of the day
+            return completedDate.getTime() === today.getTime();
+        }).length;
+
+        const dailyGoal = 3;
+        const todayProgress = Math.min(
+            Math.round((todayCompleted / dailyGoal) * 100),
+            100,
+        );
+        const remainingToday = Math.max(dailyGoal - todayCompleted, 0);
+
+        // Recent activity (last 5)
+        const recentActivity = completedLessons.slice(0, 5).map((p) => ({
+            id: p.lesson?.id,
+            title: p.lesson?.title,
+            courseTitle: p.lesson?.course?.title,
+            completedAt: p.completedAt,
+        }));
+
+        const level = calculateLevel(dbUser.points);
+        const nextLevelPoints = calculateNextLevelPoints(dbUser.points);
+
+
         return NextResponse.json({
             username,
-            level: dbUser.level,
+            level,
             totalXP: dbUser.points,
+            nextLevelPoints,
             currentStreak: dbUser.currentStreak,
             longestStreak: dbUser.longestStreak,
-            nextLevelPoints: 1000,
+            totalLessonsCompleted,
             coursesInProgress,
             completedCourses,
-            totalLessonsCompleted: completedLessons.length,
-            todayProgress: 0,
-            todayCompleted: 0,
-            remainingToday: 3,
-            recentActivity: completedLessons.slice(0, 5).map((p) => ({
-                lessonId: p.lessonId,
-                // `lesson`/`course` are "one" relations, which Drizzle v1 types
-                // as optional → guard with `?.`.
-                lessonTitle: p.lesson?.title ?? "Unknown lesson",
-                courseTitle: p.lesson?.course?.title ?? "Unknown course",
-                completedAt: p.completedAt,
-            })),
+            todayProgress,
+            todayCompleted,
+            remainingToday,
+            recentActivity,
         });
 
     } catch (error) {
-        return NextResponse.json(
-            {
-                error: "Failed to fetch user stats",
-                details: error
-            },
-            { status: 500 }
-        );
+        console.error('[UNIFIED_STATS]', error);
+        return NextResponse.json({
+            username: "Learner",
+            level: 1,
+            totalXP: 0,
+            currentStreak: 0,
+            longestStreak: 0,
+            nextLevelPoints: 1000,
+            coursesInProgress: 0,
+            completedCourses: 0,
+            totalLessonsCompleted: 0,
+            todayProgress: 0,
+            todayCompleted: 0,
+            remainingToday: 3,
+            recentActivity: [],
+        });
     }
 }
