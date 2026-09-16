@@ -1,3 +1,4 @@
+import { and, eq } from "drizzle-orm";
 import { db } from "@/app/db";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
@@ -68,12 +69,46 @@ export async function POST(
         return new NextResponse("Internal Error", { status: 500 });
     }
 }
-//Video : 1:49:52
+
 
 
 export async function DELETE(
     req: Request,
     { params }: { params: Promise<{ courseId: string }> }
 ) {
+    try {
+        const { userId } = await auth();
+        if (!userId) {
+            return new NextResponse("Unauthorized", { status: 401 });
+        }
 
+        const { courseId } = await params;
+        const user = await db.query.users.findFirst({
+            where: {
+                clerkId: userId,
+            }
+        });
+
+        if (!user) return new NextResponse("user not found", { status: 404 });
+
+        const deleted = await db.delete(enrollments).where(
+            and(
+                eq(enrollments.userId, user.id),
+                eq(enrollments.courseId, courseId),
+            ),
+        ).returning();
+
+        if (deleted.length === 0) {
+            return new NextResponse("Not enrolled", { status: 404 });
+        }
+        return NextResponse.json({
+            success: true,
+            message: "Successfully unenrolled from course. "
+        })
+
+
+    } catch (error) {
+        console.log("[ENROLL_DELETE]", error);
+        return new NextResponse("Internal Error", { status: 500 })
+    }
 }
