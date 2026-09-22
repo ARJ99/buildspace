@@ -118,7 +118,10 @@ export async function POST(req: Request) {
 
 async function updateUserStreak(userId: string) {
     const completedLessons = await db.query.progress.findMany({
-        where: and(eq(progress.userId, userId), eq(progress.completed, true)),
+        where: {
+            userId: userId,
+            completed: true
+        },
         orderBy: (progress, { desc }) => [desc(progress.completedAt)],
     });
 
