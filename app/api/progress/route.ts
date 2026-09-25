@@ -5,6 +5,8 @@ import { enrollments } from "@/app/db/schema/enrollments";
 import { progress } from "@/app/db/schema/progress";
 import { and, eq, sql } from "drizzle-orm";
 import { users } from "@/app/db/schema/users";
+import { count } from "drizzle-orm";
+import { userAchievements } from "@/app/db/schema/achievements";
 
 export async function POST(req: Request) {
     try {
@@ -178,6 +180,94 @@ async function updateUserStreak(userId: string) {
 
     console.log(`🔥 Streak updated to ${streak} days`);
 }
-async function checkAndAwardAchievements(userid: string) {
+async function checkAndAwardAchievements(userId: string) {
+    const user = await db.query.users.findFirst({
+        where: {
+            id: userId,
+        }
+    });
 
+    if (!user) return;
+
+    //Get the completed Lesosons
+    const completedLessonsResult = await db.select({ count: count() })
+        .from(progress)
+        .where(and(eq(progress.userId, userId), eq(progress.completed, true)));
+
+    const lessonsCompleted = completedLessonsResult[0]?.count || 0;
+
+    //Get the completed Courses
+    const completedCoursesResult = await db.select({ count: count() })
+        .from(enrollments)
+        .where(and(eq(enrollments.userId, userId), eq(enrollments.completed, true)));
+
+    const coursesCompleted = completedCoursesResult[0]?.count || 0;
+
+    //Get all achievements
+    const allAchievements = await db.query.achievements.findMany();
+
+    const userAchievementsList = await db.query.userAchievements.findMany({
+        where: {
+            userId: user.id,
+        }
+    });
+
+    const earnedIds = new Set(
+        userAchievementsList.map((ua) => ua.achievementId)
+    );
+
+    // Check each achievement
+    for (const achievement of allAchievements) {
+        if (earnedIds.has(achievement.id)) continue;
+
+        let shouldAward = false;
+        const criteria = achievement.criteria as any;
+
+        switch (criteria.type) {
+            case "lessons_completed":
+                if (lessonsCompleted >= criteria.count) {
+                    shouldAward = true;
+                    console.log(
+                        `✅ Achievement "${achievement.name}" earned! (${lessonsCompleted}/${criteria.count} lessons)`,
+                    );
+                }
+                break;
+            case "courses_completed":
+                if (coursesCompleted >= criteria.count) {
+                    shouldAward = true;
+                    console.log(
+                        `✅ Achievement "${achievement.name}" earned! (${coursesCompleted}/${criteria.count} courses)`,
+                    );
+                }
+                break;
+            case "streak":
+                if (user.currentStreak >= criteria.days) {
+                    shouldAward = true;
+                    console.log(
+                        `✅ Achievement "${achievement.name}" earned! (${user.currentStreak}/${criteria.days} days streak)`,
+                    );
+                }
+                break;
+        }
+
+        if (shouldAward) {
+            await db.insert(userAchievements).values({
+                userId: userId,
+                achievementId: achievement.id,
+                earnedAt: new Date(),
+            });
+
+        }
+        // Award achievement points
+        await db
+            .update(users)
+            .set({
+                points: sql`${users.points} + ${achievement.points}`,
+            })
+            .where(eq(users.id, userId));
+
+        console.log(
+            `🏆 Achievement unlocked: ${achievement.name} (+${achievement.points} XP)`,
+        );
+    }
 }
