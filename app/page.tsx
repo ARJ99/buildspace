@@ -1,8 +1,8 @@
 "use client";
 
-import { Code, Sparkles, TrendingUp } from "lucide-react";
+import { Code, Sparkles, Star, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
-import { footerLinks } from "./data";
+import { footerLinks, testimonials } from "./data";
 import { SignUpButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 
@@ -19,6 +19,58 @@ export default function LandingPage() {
       {/* How it works */}
 
       {/* Testimonials Sections */}
+      <section className="relative container mx-auto px-4 py-20 z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="text-center"
+        >
+          <h2 className="text-4xl font-bold text-gray-900">
+            Loved by Developers
+          </h2>
+          <p className="text-gray-600 mt-4">
+            Join thousands of successfull learners
+          </p>
+        </motion.div>
+        <div className="grid md:grid-cols-3 gap-6">
+          {testimonials.map((testimonial, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              whileHover={{ y: -5 }}
+              className="bg-white rounded-2xl p-6 border border-gray-100 shadow-lg flex flex-col justify-between"
+            >
+              <div className="flex gap-1 mb-4">
+                {[...Array(testimonial.rating)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className="w-4 h-4 fill-yellow-400 text-yellow-400"
+                  />
+                ))}
+              </div>
+              <p className="text-gray-700 mb-4">"{testimonial.content}"</p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-linear-to-br from-purple-600 to-indigo-600 rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold">
+                    {testimonial.name[0]}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-gray-900 font-semibold text-sm">
+                    {testimonial.name}
+                  </p>
+                  <p className="text-gray-500 text-xs">{testimonial.role}</p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
 
       {/* CTA Section*/}
       <section className="relative container mx-auto px-4 py-20 z-10">
@@ -98,4 +150,3 @@ export default function LandingPage() {
     </div>
   );
 }
-//2:39:00
