@@ -1,5 +1,10 @@
-import { Code } from "lucide-react";
+"use client";
+
+import { Code, Sparkles, TrendingUp } from "lucide-react";
+import { motion } from "framer-motion";
 import { footerLinks } from "./data";
+import { SignUpButton } from "@clerk/nextjs";
+import { Button } from "@/components/ui/button";
 
 
 export default function LandingPage() {
@@ -16,6 +21,52 @@ export default function LandingPage() {
       {/* Testimonials Sections */}
 
       {/* CTA Section*/}
+      <section className="relative container mx-auto px-4 py-20 z-10">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="relative overflow-hidden rounded-3xl bg-linear-to-r from-purple-600 via-pink-600 to-indigo-600 p-12 text-center shadow-xl"
+        >
+          {/* <div className="absolute inset-0 bg-black/10" /> */}
+          <div className="relative z-10">
+            <motion.div
+              animate={{ y: [0, -5, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 rounded-full mb-6"
+            >
+              <Sparkles className="w-4 h-4 text-white" />
+              <span className="text-white text-sm font-medium">
+                Limited Time Offer
+              </span>
+            </motion.div>
+
+            <h2 className="text-4xl font-bold text-white mb-4">
+              Ready to Start Your Journey?
+            </h2>
+            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+              Join thousands of developers who are already building their future
+              with BuildSpace
+            </p>
+
+            <SignUpButton mode="modal">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Button
+                  size="lg"
+                  className="bg-white text-purple-600 hover:bg-gray-100 text-lg px-8 shadow-lg"
+                >
+                  Get Started For Free
+                  <TrendingUp className="ml-2 h-5 w-5" />
+                </Button>
+              </motion.div>
+            </SignUpButton>
+          </div>
+        </motion.div>
+      </section>
 
       {/* Footer */}
       <footer className="relative border-t border-gray-200 py-8 z-10 bg-white/50">
@@ -47,3 +98,4 @@ export default function LandingPage() {
     </div>
   );
 }
+//2:39:00
