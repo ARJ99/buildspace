@@ -1,8 +1,8 @@
 "use client";
 
-import { Code, Sparkles, Star, TrendingUp } from "lucide-react";
+import { ChevronRight, Code, Sparkles, Star, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
-import { footerLinks, testimonials } from "./data";
+import { footerLinks, steps, testimonials } from "./data";
 import { SignUpButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 
@@ -17,6 +17,50 @@ export default function LandingPage() {
       {/* Feature Sections */}
 
       {/* How it works */}
+      <section className="relative container mx-auto px-4 py-20 z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-4xl font-bold text-gray-900">How It Works</h2>
+          <p className="text-gray-600 mt-4">Get started in 4 simple steps</p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-4 gap-8">
+          {steps.map((item, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              className="text-center group"
+            >
+              <div className="relative">
+                <div className="w-20 h-20 mx-auto bg-linear-to-br from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <item.icon className="w-8 h-8 text-white" />
+                </div>
+                <div className="absolute -right-4 top-8 hidden md:block">
+                  {index < steps.length - 1 && (
+                    <ChevronRight className="w-6 h-6 text-gray-400" />
+                  )}
+                </div>
+              </div>
+              <div className="text-4xl font-bold text-purple-600 mb-2">
+                {item.step}
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {item.title}
+              </h3>
+              <p className="text-gray-600 text-sm">{item.description}</p>
+            </motion.div>
+          ))}
+
+        </div>
+      </section>
 
       {/* Testimonials Sections */}
       <section className="relative container mx-auto px-4 py-20 z-10">
