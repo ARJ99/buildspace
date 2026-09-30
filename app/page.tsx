@@ -2,7 +2,7 @@
 
 import { ChevronRight, Code, Sparkles, Star, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
-import { footerLinks, steps, testimonials } from "./data";
+import { features, footerLinks, steps, testimonials } from "./data";
 import { SignUpButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 
@@ -15,6 +15,48 @@ export default function LandingPage() {
       {/* Navigation */}
 
       {/* Feature Sections */}
+      <section className="relative container mx-auto px-4 py-20 z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-4xl font-bold text-gray-900">
+            Why Choose BuildSpace?
+          </h2>
+          <p className="text-gray-600 mt-4">
+            Everything you need to become a developer
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          {features.map((feature, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: feature.delay }}
+              viewport={{ once: true }}
+              whileHover={{ y: -10, scale: 1.02 }}
+              className="group bg-white rounded-2xl p-8 border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              <div className="relative">
+                <div className="w-16 h-16 bg-linear-to-br from-purple-100 to-indigo-100 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <feature.icon className="w-8 h-8 text-purple-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {feature.description}
+                </p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
 
       {/* How it works */}
       <section className="relative container mx-auto px-4 py-20 z-10">
