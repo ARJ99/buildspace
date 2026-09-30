@@ -1,8 +1,8 @@
 "use client";
 
-import { ChevronRight, Code, Sparkles, Star, TrendingUp } from "lucide-react";
+import { ArrowRight, ChevronRight, Code, Sparkles, Star, TrendingUp, Zap } from "lucide-react";
 import { motion } from "framer-motion";
-import { features, footerLinks, steps, testimonials } from "./data";
+import { features, footerLinks, stats, steps, testimonials } from "./data";
 import { SignUpButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 
@@ -13,6 +13,82 @@ export default function LandingPage() {
       {/* Aniamated Background */}
 
       {/* Navigation */}
+
+      {/* Hero Section */}
+      <section className="relative container mx-auto px-4 py-20 text-center z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.5, type: "spring" }}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 rounded-full border border-purple-200 mb-6"
+          >
+            <Zap className="w-4 h-4 text-purple-600" />
+            <span className="text-sm text-purple-700 font-medium">
+              Launching Soon
+            </span>
+          </motion.div>
+
+          <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-linear-to-r from-purple-600 via-pink-600 to-indigo-600 bg-clip-text text-transparent">
+            Learn by Building
+          </h1>
+
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10">
+            Master modern web development through hands-on projects, earn
+            achievements, compete with friends, and level up your career.
+          </p>
+
+          <div className="flex items-center justify-center gap-4">
+            <SignUpButton mode="modal">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                animate={{ y: [0, -5, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <Button
+                  size="lg"
+                  className="bg-linear-to-r from-purple-600 to-indigo-600 text-white text-lg px-8 shadow-lg hover:shadow-xl"
+                >
+                  Start Learning Free
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </motion.div>
+            </SignUpButton>
+          </div>
+        </motion.div>
+
+        {/* Stats Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-20"
+        >
+          {stats.map((stat, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="bg-white rounded-2xl p-6 border border-gray-100 shadow-lg hover:shadow-xl transition-all"
+            >
+              <stat.icon
+                className={`w-8 h-8 text-${stat.color}-600 mx-auto mb-3`}
+              />
+              <div className={`text-3xl font-bold text-${stat.color}-600`}>
+                {stat.value}
+              </div>
+              <div className="text-gray-600 text-sm">{stat.label}</div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </section>
 
       {/* Feature Sections */}
       <section className="relative container mx-auto px-4 py-20 z-10">
