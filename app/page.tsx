@@ -3,11 +3,42 @@
 import { ArrowRight, ChevronRight, Code, Sparkles, Star, TrendingUp, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import { features, footerLinks, stats, steps, testimonials } from "./data";
-import { SignInButton, SignUpButton } from "@clerk/nextjs";
+import { SignInButton, SignUpButton, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 
 export default function LandingPage() {
+
+  const { isSignedIn, isLoaded } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isSignedIn && isLoaded) {
+      router.push("/dashboard");
+    }
+  }, [isSignedIn, isLoaded]);
+
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-purple-100 via-indigo-100 to-blue-100">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full"
+        />
+      </div>
+    )
+  }
+
+  if (isSignedIn) {
+    return null;
+  }
+
+
+
+
   return (
     <div className="min-h-screen bg-linear-to-br from-purple-50 via-white to-indigo-50 overflow-hidden">
 
