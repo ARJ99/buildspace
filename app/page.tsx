@@ -3,16 +3,61 @@
 import { ArrowRight, ChevronRight, Code, Sparkles, Star, TrendingUp, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import { features, footerLinks, stats, steps, testimonials } from "./data";
-import { SignUpButton } from "@clerk/nextjs";
+import { SignInButton, SignUpButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-linear-to-br from-purple-50 via-white to-indigo-50 overflow-hidden">
-      {/* Aniamated Background */}
+
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse delay-1000" />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse delay-2000" />
+      </div>
+
 
       {/* Navigation */}
+      <motion.nav
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="relative container mx-auto px-4 py-6 flex items-center justify-between z-10"
+      >
+        <div className="flex items-center gap-2">
+          <motion.div
+            whileHover={{ rotate: 360 }}
+            transition={{ duration: 0.5 }}
+            className="w-10 h-10 bg-linear-to-br from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg"
+          >
+            <Code className="w-5 h-5 text-white" />
+          </motion.div>
+          <span className="text-xl font-bold bg-linear-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+            BuildSpace
+          </span>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <SignInButton mode="modal">
+            <Button
+              variant="ghost"
+              className="text-gray-700 hover:text-purple-600"
+            >
+              Sign In
+            </Button>
+          </SignInButton>
+          <SignUpButton mode="modal">
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button className="bg-linear-to-r from-purple-600 to-indigo-600 text-white hover:shadow-lg hover:shadow-purple-500/25">
+                Get Started
+                <Sparkles className="ml-2 h-4 w-4" />
+              </Button>
+            </motion.div>
+          </SignUpButton>
+        </div>
+      </motion.nav>
 
       {/* Hero Section */}
       <section className="relative container mx-auto px-4 py-20 text-center z-10">
