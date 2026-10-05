@@ -1,22 +1,260 @@
 "use client";
 
-import { Code, Sparkles, Star, TrendingUp } from "lucide-react";
+import { ArrowRight, ChevronRight, Code, Sparkles, Star, TrendingUp, Zap } from "lucide-react";
 import { motion } from "framer-motion";
-import { footerLinks, testimonials } from "./data";
-import { SignUpButton } from "@clerk/nextjs";
+import { features, footerLinks, stats, steps, testimonials } from "./data";
+import { SignInButton, SignUpButton, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 
 export default function LandingPage() {
+
+  const { isSignedIn, isLoaded } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isSignedIn && isLoaded) {
+      router.push("/dashboard");
+    }
+  }, [isSignedIn, isLoaded]);
+
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-purple-100 via-indigo-100 to-blue-100">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full"
+        />
+      </div>
+    )
+  }
+
+  if (isSignedIn) {
+    return null;
+  }
+
+
+
+
   return (
     <div className="min-h-screen bg-linear-to-br from-purple-50 via-white to-indigo-50 overflow-hidden">
-      {/* Aniamated Background */}
+
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse delay-1000" />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse delay-2000" />
+      </div>
+
 
       {/* Navigation */}
+      <motion.nav
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="relative container mx-auto px-4 py-6 flex items-center justify-between z-10"
+      >
+        <div className="flex items-center gap-2">
+          <motion.div
+            whileHover={{ rotate: 360 }}
+            transition={{ duration: 0.5 }}
+            className="w-10 h-10 bg-linear-to-br from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg"
+          >
+            <Code className="w-5 h-5 text-white" />
+          </motion.div>
+          <span className="text-xl font-bold bg-linear-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+            BuildSpace
+          </span>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <SignInButton mode="modal">
+            <Button
+              variant="ghost"
+              className="text-gray-700 hover:text-purple-600"
+            >
+              Sign In
+            </Button>
+          </SignInButton>
+          <SignUpButton mode="modal">
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button className="bg-linear-to-r from-purple-600 to-indigo-600 text-white hover:shadow-lg hover:shadow-purple-500/25">
+                Get Started
+                <Sparkles className="ml-2 h-4 w-4" />
+              </Button>
+            </motion.div>
+          </SignUpButton>
+        </div>
+      </motion.nav>
+
+      {/* Hero Section */}
+      <section className="relative container mx-auto px-4 py-20 text-center z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.5, type: "spring" }}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 rounded-full border border-purple-200 mb-6"
+          >
+            <Zap className="w-4 h-4 text-purple-600" />
+            <span className="text-sm text-purple-700 font-medium">
+              Launching Soon
+            </span>
+          </motion.div>
+
+          <h1 className="text-6xl md:text-7xl font-bold mb-6 bg-linear-to-r from-purple-600 via-pink-600 to-indigo-600 bg-clip-text text-transparent">
+            Learn by Building
+          </h1>
+
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10">
+            Master modern web development through hands-on projects, earn
+            achievements, compete with friends, and level up your career.
+          </p>
+
+          <div className="flex items-center justify-center gap-4">
+            <SignUpButton mode="modal">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                animate={{ y: [0, -5, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <Button
+                  size="lg"
+                  className="bg-linear-to-r from-purple-600 to-indigo-600 text-white text-lg px-8 shadow-lg hover:shadow-xl"
+                >
+                  Start Learning Free
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </motion.div>
+            </SignUpButton>
+          </div>
+        </motion.div>
+
+        {/* Stats Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-20"
+        >
+          {stats.map((stat, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="bg-white rounded-2xl p-6 border border-gray-100 shadow-lg hover:shadow-xl transition-all"
+            >
+              <stat.icon
+                className={`w-8 h-8 text-${stat.color}-600 mx-auto mb-3`}
+              />
+              <div className={`text-3xl font-bold text-${stat.color}-600`}>
+                {stat.value}
+              </div>
+              <div className="text-gray-600 text-sm">{stat.label}</div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </section>
 
       {/* Feature Sections */}
+      <section className="relative container mx-auto px-4 py-20 z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-4xl font-bold text-gray-900">
+            Why Choose BuildSpace?
+          </h2>
+          <p className="text-gray-600 mt-4">
+            Everything you need to become a developer
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          {features.map((feature, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: feature.delay }}
+              viewport={{ once: true }}
+              whileHover={{ y: -10, scale: 1.02 }}
+              className="group bg-white rounded-2xl p-8 border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              <div className="relative">
+                <div className="w-16 h-16 bg-linear-to-br from-purple-100 to-indigo-100 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <feature.icon className="w-8 h-8 text-purple-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {feature.description}
+                </p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
 
       {/* How it works */}
+      <section className="relative container mx-auto px-4 py-20 z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-4xl font-bold text-gray-900">How It Works</h2>
+          <p className="text-gray-600 mt-4">Get started in 4 simple steps</p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-4 gap-8">
+          {steps.map((item, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              className="text-center group"
+            >
+              <div className="relative">
+                <div className="w-20 h-20 mx-auto bg-linear-to-br from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <item.icon className="w-8 h-8 text-white" />
+                </div>
+                <div className="absolute -right-4 top-8 hidden md:block">
+                  {index < steps.length - 1 && (
+                    <ChevronRight className="w-6 h-6 text-gray-400" />
+                  )}
+                </div>
+              </div>
+              <div className="text-4xl font-bold text-purple-600 mb-2">
+                {item.step}
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {item.title}
+              </h3>
+              <p className="text-gray-600 text-sm">{item.description}</p>
+            </motion.div>
+          ))}
+
+        </div>
+      </section>
 
       {/* Testimonials Sections */}
       <section className="relative container mx-auto px-4 py-20 z-10">
