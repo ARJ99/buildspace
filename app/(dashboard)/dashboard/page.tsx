@@ -149,7 +149,43 @@ export default function DashboardPage() {
             </div>
 
             {/* Recent Activity */}
-            
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <Award className="h-5 w-5 text-yellow-500" />
+                        Recent Activity
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    {stats?.recentActivity?.length > 0 ? (
+                        <div className="space-y-3">
+                            {stats.recentActivity.map((activity: any) => (
+                                <div
+                                    key={activity.id}
+                                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                                >
+                                    <div className="flex-1">
+                                        <p className="font-medium text-sm">{activity.title}</p>
+                                        <p className="text-xs text-gray-500">
+                                            {activity.courseTitle}
+                                        </p>
+                                    </div>
+                                    <p className="text-xs text-gray-400">
+                                        {new Date(activity.completedAt).toLocaleDateString()}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-8 text-gray-500">
+                            <BookOpen className="h-12 w-12 mx-auto mb-3 text-gray-400" />
+                            <p>No activity yet</p>
+                            <p className="text-sm">Complete a lesson to get started!</p>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+            3:43:25
         </div>
     )
 }
