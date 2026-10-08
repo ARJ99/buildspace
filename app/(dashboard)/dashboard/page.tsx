@@ -185,7 +185,6 @@ export default function DashboardPage() {
                     )}
                 </CardContent>
             </Card>
-            3:43:25
         </div>
     )
 }
