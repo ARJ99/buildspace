@@ -2,7 +2,17 @@
 import { db } from "@/app/db";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-
+type formattedCourses = {
+    id: string;
+    title: string;
+    description: string;
+    thumbnail: string | null;
+    duration: number;
+    points: number;
+    totalLessons: number;
+    enrolled: boolean;
+    progress: number;
+}[]
 export async function GET(request: Request) {
 
     try {

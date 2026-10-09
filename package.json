@@ -20,6 +20,7 @@
     "class-variance-authority": "^0.7.1",
     "cls": "^0.1.5",
     "clsx": "^2.1.1",
+    "cn": "^0.4.0",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^1.0.0-rc.4",
     "framer-motion": "^13.1.1",
