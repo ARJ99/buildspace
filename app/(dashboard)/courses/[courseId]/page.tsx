@@ -2,6 +2,7 @@
 "use client"
 
 import EnrollButton from "@/components/common/enroll-button";
+import { YoutubeVideo } from "@/components/common/youtube-video";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,14 +14,40 @@ import { Award, CheckCircle, Clock, FileText, Lock, PlayCircle, Video } from "lu
 import { useParams } from "next/navigation";
 import { useState } from "react";
 
+interface CourseAndLesson {
+    id: string;
+    title: string;
+    description: string;
+    difficulty: "beginner" | "intermediate" | "advanced";
+    thumbnail: string | null;
+    duration: number;
+    points: number;
+    enrolled: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    lessons: CourseLesson[];
+}
+
+interface CourseLesson {
+    id: string;
+    title: string;
+    content: string;
+    videoUrl: string | null;
+    order: number;
+    courseId: string;
+    createdAt: Date;
+    completed: boolean;
+}
+
+
 export default function CourseDetailsPage() {
 
     const { courseId } = useParams();
 
     const queryClient = useQueryClient();
-    const [selectedLesson, setSelectedLesson] = useState<any>({});
+    const [selectedLesson, setSelectedLesson] = useState<CourseLesson | null>(null);
 
-    const { data: course, isLoading, refetch } = useQuery({
+    const { data: course, isLoading, refetch } = useQuery<CourseAndLesson>({
         queryKey: ["course", courseId],
         queryFn: async () => {
             const resp = await fetch(`/api/courses/${courseId}`);
@@ -29,6 +56,7 @@ export default function CourseDetailsPage() {
             return { ...data.course, lessons: data.lessons };
         }
     });
+
 
     const completeLessonMutation = useMutation({
         mutationFn: async (lessonId: string) => {
@@ -53,10 +81,10 @@ export default function CourseDetailsPage() {
         // refetch();
         // queryClient.invalidateQueries({ queryKey: ["stats"] });
         if (enrolled) {
-            refetch();                     // celebrate enrollment
+            refetch();
             queryClient.invalidateQueries({ queryKey: ["stats"] });
         } else {
-            console.log('You left the course');     // different reaction to unenroll
+            console.log('You left the course');
             queryClient.invalidateQueries({ queryKey: ["stats"] });
         }
     };
@@ -78,7 +106,7 @@ export default function CourseDetailsPage() {
     }
 
     const completedLessons =
-        course?.lessons?.filter((l: any) => l.completed).length || 0;
+        course?.lessons?.filter((l: CourseLesson) => l.completed).length || 0;
     const totalLessons = course?.lessons?.length || 0;
     const progress =
         totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0;
@@ -125,6 +153,7 @@ export default function CourseDetailsPage() {
                 </div>
             </div>
 
+            {/* Course Lessons Listed */}
             <div className="grid gap-6 lg:grid-cols-3">
                 <div className="lg:col-span-2 space-y-6">
                     <Tabs defaultValue="lessons" className="space-y-4">
@@ -134,7 +163,7 @@ export default function CourseDetailsPage() {
                         </TabsList>
 
                         <TabsContent value="lessons" className="space-y-4">
-                            {course?.lessons?.map((lesson: any, index: number) => {
+                            {course?.lessons?.map((lesson: CourseLesson, index: number) => {
                                 const isLocked = !course?.enrolled && index > 0;
                                 const canStart =
                                     course?.enrolled &&
@@ -321,7 +350,49 @@ export default function CourseDetailsPage() {
                 </div>
             </div>
 
-            {/* Lesson Modal - Simple version without notes */}
+            {/* Lesson Modal */}
+            {selectedLesson && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+                    <Card className="max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Video className="h-5 w-5 text-purple-600" />
+                                {selectedLesson.title}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            {selectedLesson.videoUrl &&
+                                getYouTubeId(selectedLesson.videoUrl) && (
+                                    <YoutubeVideo
+                                        videoId={getYouTubeId(selectedLesson.videoUrl)!}
+                                        title={selectedLesson.title}
+                                    />
+                                )}
+
+                            <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
+                                <Button
+                                    variant="outline"
+                                    onClick={() => setSelectedLesson(null)}
+                                >
+                                    Close
+                                </Button>
+                                {course?.enrolled && !selectedLesson.completed && (
+                                    <Button
+                                        onClick={() => {
+                                            completeLessonMutation.mutate(selectedLesson.id);
+                                            setSelectedLesson(null);
+                                        }}
+                                        className="bg-purple-600 hover:bg-purple-700"
+                                    >
+                                        Mark as Complete
+                                    </Button>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                </div>
+            )}
         </div>
     )
 }
