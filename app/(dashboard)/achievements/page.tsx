@@ -1,5 +1,5 @@
-export default function Page() {
+export default function AchievementsPage() {
     return (
-        <div>achievements</div>
+        <div>AchievementsPage</div>
     )
 }
