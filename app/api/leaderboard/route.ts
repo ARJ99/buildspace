@@ -91,6 +91,7 @@ export async function GET() {
             userPoints: 0,
             userLevel: 1,
             userStreak: 0,
+            totalUsers: 0,
         })
     }
 }

@@ -26,7 +26,7 @@ export function CourseCard({ id, title, description, thumbnail, duration, progre
 
 
     return (
-        <Link href={`/course${id}`}>
+        <Link href={`/courses/${id}`}>
             <Card
                 className={cn(
                     "group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden",

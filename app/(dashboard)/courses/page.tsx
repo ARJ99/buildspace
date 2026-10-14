@@ -32,8 +32,8 @@ export default function CoursesPage() {
         }
     })
 
-    const filteredCourses = courses?.filter((course: Courses) => {
-        const matchesSearch = course.title.toLowerCase().includes(search) || course.description.toLowerCase().includes(search.toLowerCase());
+    const filteredCourses:Courses[] = courses?.filter((course: Courses) => {
+        const matchesSearch = course.title.toLowerCase().includes(search.toLowerCase()) || course.description.toLowerCase().includes(search.toLowerCase());
         return matchesSearch;
     });
 

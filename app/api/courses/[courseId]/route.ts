@@ -77,10 +77,13 @@ export async function GET(
             }));
         }
 
-        return NextResponse.json({ course, lessons: lessonWithProgress });
+        return NextResponse.json({
+            course: { ...course, enrolled: !!enrollment },
+            lessons: lessonWithProgress,
+        });
 
     } catch (error) {
-        console.log(error);
-        return new NextResponse("Internal Server Error", { status: 500 });
+        console.log("[COURSE_GET]", error);
+        return new NextResponse("Internal Error", { status: 500 });
     }
 }

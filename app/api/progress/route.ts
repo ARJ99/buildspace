@@ -82,7 +82,7 @@ export async function POST(req: Request) {
         }
 
         //If lesson completed, award points, update streak, and check achievements
-        if (!completed) {
+        if (completed) {
             //award points
             const courseWithLessons = await db.query.courses.findFirst({
                 where: {
@@ -111,6 +111,9 @@ export async function POST(req: Request) {
 
             return NextResponse.json({ success: true })
         }
+
+        // Return a valid response even when a lesson is marked incomplete
+        return NextResponse.json({ success: true })
     } catch (error) {
         console.log("[PROGRESS_POST]", error);
         return new NextResponse("Internal Error", { status: 500 });
