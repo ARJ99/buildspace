@@ -3,6 +3,9 @@ import * as dotenv from "dotenv";
 import { lessons } from "./schema/lessons";
 import { db } from "./index";
 import { courses } from "./schema/courses";
+import { achievementsData } from '../data/index';
+import { achievements } from "./schema/achievements";
+
 
 dotenv.config({ path: ".env" });
 
@@ -103,6 +106,24 @@ async function fetchPlaylistVideos(playlistId: string, playlistTitle: string) {
 
     console.log(`    ✅ Found ${allVideos.length} videos`);
     return allVideos;
+}
+
+// Seed Achievements
+async function seedAchievements(){
+    console.log("seeding achievements");
+    for(const achievement of achievementsData){
+        const existing = await db.query.achievements.findFirst({
+            where:{
+                name:achievement.name
+            }
+        });
+        if(!existing){
+            await db.insert(achievements).values(achievement);
+        }else{
+            console.log(`Achievement already exists: ${achievement.name}`);
+        }
+    }
+
 }
 
 // Seed courses into database
@@ -208,12 +229,11 @@ async function seedCoursesFromPlaylists() {
 }
 
 // Run the import
-seedCoursesFromPlaylists()
-    .then(() => {
-        console.log("\n✅ YouTube content import finished!");
-        process.exit(0);
-    })
-    .catch((error) => {
-        console.error("❌ Import failed:", error);
-        process.exit(1);
-    });
+async function seed(){
+    console.log("Starting ...");
+    await seedAchievements();
+    await seedCoursesFromPlaylists();
+    console.log("Completed!");
+}
+
+seed().catch(console.error)
